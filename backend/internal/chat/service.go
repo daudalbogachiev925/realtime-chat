@@ -204,3 +204,17 @@ func (s *Service) RunPresenceHeartbeat(ctx context.Context) {
 		}
 	}
 }
+
+// BroadcastPresence — вход/выход юзера в комнату
+func (s *Service) BroadcastPresence(ctx context.Context, c *Client, online bool) {
+	payload, _ := json.Marshal(map[string]any{
+		"type":    "presence",
+		"room_id": c.roomID,
+		"payload": map[string]any{
+			"user_id":  c.userID.String(),
+			"username": c.username,
+			"online":   online,
+		},
+	})
+	_ = s.Bus.Publish(ctx, roomChannel(c.roomID), payload)
+}
